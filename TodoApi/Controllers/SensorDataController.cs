@@ -6,11 +6,11 @@ using System.Linq;
 namespace TodoApi.Controllers
 {
     [Route("api/v1/homes/")]
-    public class TodoController : Controller
+    public class SensorDataController : Controller
     {
         private readonly SensorDataContext _context;
 
-        public TodoController(SensorDataContext context)
+        public SensorDataController(SensorDataContext context)
         {
             _context = context;
 
@@ -27,7 +27,7 @@ namespace TodoApi.Controllers
             return _context.SensorData.ToList();
         }
 
-        [HttpGet("{id}", Name = "GetTodo")]
+        [HttpGet("hus{id}/data", Name = "GetSensorReadings")]
         public IActionResult GetById(long id)
         {
             var item = _context.SensorData.FirstOrDefault(t => t.Id == id);
@@ -38,7 +38,7 @@ namespace TodoApi.Controllers
             return new ObjectResult(item);
         }
 
-        [HttpPost]
+        [HttpPost("hus{id}/data")]
         public IActionResult Create([FromBody] SensorData item)
         {
             if (item == null)
@@ -49,10 +49,11 @@ namespace TodoApi.Controllers
             _context.SensorData.Add(item);
             _context.SaveChanges();
 
-            return CreatedAtRoute("GetTodo", new { id = item.Id }, item);
+            return CreatedAtRoute("GetSensorReadings", new { id = item.Id }, item);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("hus{id}/data")]
+//        [HttpPut("{id}")]
         public IActionResult Update(long id, [FromBody] SensorData item)
         {
             if (item == null || item.Id != id)
@@ -60,33 +61,33 @@ namespace TodoApi.Controllers
                 return BadRequest();
             }
 
-            var todo = _context.SensorData.FirstOrDefault(t => t.Id == id);
-            if (todo == null)
+            var sensorReading = _context.SensorData.FirstOrDefault(t => t.Id == id);
+            if (sensorReading == null)
             {
                 return NotFound();
             }
 
-            todo.Name = item.Name;
-            todo.Temperature = item.Temperature;
-            todo.Humidity = item.Humidity;
-            todo.Soil = item.Soil;
-            todo.Motion = item.Motion;
+            sensorReading.Name = item.Name;
+            sensorReading.Temperature = item.Temperature;
+            sensorReading.Humidity = item.Humidity;
+            sensorReading.Soil = item.Soil;
+            sensorReading.Motion = item.Motion;
 
-        _context.SensorData.Update(todo);
+        _context.SensorData.Update(sensorReading);
             _context.SaveChanges();
             return new NoContentResult();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("hus{id}/data")]
         public IActionResult Delete(long id)
         {
-            var todo = _context.SensorData.FirstOrDefault(t => t.Id == id);
-            if (todo == null)
+            var sensorReading = _context.SensorData.FirstOrDefault(t => t.Id == id);
+            if (sensorReading == null)
             {
                 return NotFound();
             }
 
-            _context.SensorData.Remove(todo);
+            _context.SensorData.Remove(sensorReading);
             _context.SaveChanges();
             return new NoContentResult();
         }
