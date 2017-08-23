@@ -5,32 +5,32 @@ using System.Linq;
 
 namespace TodoApi.Controllers
 {
-    [Route("api/todo")]
+    [Route("api/v1/homes/")]
     public class TodoController : Controller
     {
-        private readonly TodoContext _context;
+        private readonly SensorDataContext _context;
 
-        public TodoController(TodoContext context)
+        public TodoController(SensorDataContext context)
         {
             _context = context;
 
-            if (_context.TodoItems.Count() == 0)
+            if (_context.SensorData.Count() == 0)
             {
-                _context.TodoItems.Add(new TodoItem { Name = "Item1" });
+                _context.SensorData.Add(new SensorData { Name = "" });
                 _context.SaveChanges();
             }
         }
 
         [HttpGet]
-        public IEnumerable<TodoItem> GetAll()
+        public IEnumerable<SensorData> GetAll()
         {
-            return _context.TodoItems.ToList();
+            return _context.SensorData.ToList();
         }
 
         [HttpGet("{id}", Name = "GetTodo")]
         public IActionResult GetById(long id)
         {
-            var item = _context.TodoItems.FirstOrDefault(t => t.Id == id);
+            var item = _context.SensorData.FirstOrDefault(t => t.Id == id);
             if (item == null)
             {
                 return NotFound();
@@ -39,37 +39,40 @@ namespace TodoApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] TodoItem item)
+        public IActionResult Create([FromBody] SensorData item)
         {
             if (item == null)
             {
                 return BadRequest();
             }
 
-            _context.TodoItems.Add(item);
+            _context.SensorData.Add(item);
             _context.SaveChanges();
 
             return CreatedAtRoute("GetTodo", new { id = item.Id }, item);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(long id, [FromBody] TodoItem item)
+        public IActionResult Update(long id, [FromBody] SensorData item)
         {
             if (item == null || item.Id != id)
             {
                 return BadRequest();
             }
 
-            var todo = _context.TodoItems.FirstOrDefault(t => t.Id == id);
+            var todo = _context.SensorData.FirstOrDefault(t => t.Id == id);
             if (todo == null)
             {
                 return NotFound();
             }
 
-            todo.IsComplete = item.IsComplete;
             todo.Name = item.Name;
+            todo.Temperature = item.Temperature;
+            todo.Humidity = item.Humidity;
+            todo.Soil = item.Soil;
+            todo.Motion = item.Motion;
 
-            _context.TodoItems.Update(todo);
+        _context.SensorData.Update(todo);
             _context.SaveChanges();
             return new NoContentResult();
         }
@@ -77,13 +80,13 @@ namespace TodoApi.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(long id)
         {
-            var todo = _context.TodoItems.FirstOrDefault(t => t.Id == id);
+            var todo = _context.SensorData.FirstOrDefault(t => t.Id == id);
             if (todo == null)
             {
                 return NotFound();
             }
 
-            _context.TodoItems.Remove(todo);
+            _context.SensorData.Remove(todo);
             _context.SaveChanges();
             return new NoContentResult();
         }
